@@ -1,6 +1,4 @@
-# coding: utf-8
-# license: GPLv3
-# проверка
+from solar_objects import Star, Planet
 
 gravitational_constant = 6.67408E-11
 G = gravitational_constant
