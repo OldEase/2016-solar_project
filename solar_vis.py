@@ -1,9 +1,8 @@
-# coding: utf-8
-# license: GPLv3
 
+import pygame
 """Модуль визуализации.
 Нигде, кроме этого модуля, не используются экранные координаты объектов.
-Функции, создающие гaрафические объекты и перемещающие их на экране, принимают физические координаты
+Функции, создающие графические объекты и перемещающие их на экране, принимают физические координаты
 """
 
 header_font = "Arial-16"
@@ -21,14 +20,14 @@ scale_factor = None
 Мера: количество пикселей на один метр."""
 
 
-def calculate_scale_factor(max_distance):
+def calculate_scale_factor(func_max_distance, func_window_height, func_window_width):
     """Вычисляет значение глобальной переменной **scale_factor** по данной характерной длине"""
-    global scale_factor
-    scale_factor = 0.4*min(window_height, window_width)/max_distance
-    print('Scale factor:', scale_factor)
+    func_scale_factor = 0.4*min(func_window_height, func_window_width)/func_max_distance
+    print('Scale factor:', func_scale_factor)
+    return func_scale_factor
 
 
-def scale_x(x):
+def scale_x(x, func_scale_factor, func_window_width):
     """Возвращает экранную **x** координату по **x** координате модели.
     Принимает вещественное число, возвращает целое число.
     В случае выхода **x** координаты за пределы экрана возвращает
@@ -39,10 +38,10 @@ def scale_x(x):
     **x** — x-координата модели.
     """
 
-    return int(x*scale_factor) + window_width//2
+    return int(round(x*func_scale_factor)) + func_window_width//2
 
 
-def scale_y(y):
+def scale_y(y, func_scale_factor, func_window_height):
     """Возвращает экранную **y** координату по **y** координате модели.
     Принимает вещественное число, возвращает целое число.
     В случае выхода **y** координаты за пределы экрана возвращает
@@ -54,10 +53,10 @@ def scale_y(y):
     **y** — y-координата модели.
     """
 
-    return y  # FIXME: not done yet
+    return -int(round(y*func_scale_factor)) + func_window_height//2
 
 
-def create_star_image(space, star):
+def create_star_image(func_space, func_star, func_scale_factor, func_window_height, func_window_width):
     """Создаёт отображаемый объект звезды.
 
     Параметры:
@@ -66,13 +65,13 @@ def create_star_image(space, star):
     **star** — объект звезды.
     """
 
-    x = scale_x(star.x)
-    y = scale_y(star.y)
-    r = star.R
-    star.image = space.create_oval([x - r, y - r], [x + r, y + r], fill=star.color)
+    x = scale_x(func_star.x, func_scale_factor, func_window_width)
+    y = scale_y(func_star.y, func_scale_factor, func_window_height)
+    r = func_star.R
+    pygame.draw.circle(func_space, func_star.color, (x, y), r, 0)
 
 
-def create_planet_image(space, planet):
+def create_planet_image(func_space, func_planet, func_scale_factor, func_window_height, func_window_width):
     """Создаёт отображаемый объект планеты.
 
     Параметры:
@@ -80,7 +79,10 @@ def create_planet_image(space, planet):
     **space** — холст для рисования.
     **planet** — объект планеты.
     """
-    pass  # FIXME: сделать как у звезды
+    x = scale_x(func_planet.x, func_scale_factor, func_window_width)
+    y = scale_y(func_planet.y, func_scale_factor, func_window_height)
+    r = func_planet.R
+    pygame.draw.circle(func_space, func_planet.color, (x, y), r, 0)
 
 
 def update_system_name(space, system_name):
@@ -92,7 +94,7 @@ def update_system_name(space, system_name):
     **space** — холст для рисования.
     **system_name** — название системы тел.
     """
-    space.create_text(30, 80, tag="header", text=system_name, font=header_font)
+    '''space.create_text(30, 80, tag="header", text=system_name, font=header_font)'''
 
 
 def update_object_position(space, body):
@@ -103,13 +105,14 @@ def update_object_position(space, body):
     **space** — холст для рисования.
     **body** — тело, которое нужно переместить.
     """
+    pass
     x = scale_x(body.x)
     y = scale_y(body.y)
     r = body.R
-    if x + r < 0 or x - r > window_width or y + r < 0 or y - r > window_height:
+    '''if x + r < 0 or x - r > window_width or y + r < 0 or y - r > window_height:
         space.coords(body.image, window_width + r, window_height + r,
                      window_width + 2*r, window_height + 2*r)  # положить за пределы окна
-    space.coords(body.image, x - r, y - r, x + r, y + r)
+    space.coords(body.image, x - r, y - r, x + r, y + r)'''
 
 
 if __name__ == "__main__":
