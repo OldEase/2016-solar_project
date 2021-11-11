@@ -1,4 +1,5 @@
 from solar_objects import Star, Planet
+import matplotlib.pyplot as plt
 
 
 def read_space_objects_data_from_file(input_filename):
@@ -94,5 +95,27 @@ def write_space_objects_data_to_file(output_filename, space_objects):
             print(out_file, "%s %d %s %f %f %f %f %f %f" % (
                 obj.type, obj.R, obj.color, obj.m, obj.x, obj.y, obj.Vx, obj.Vy))
 
+def write_space_objects_stat(output_filename, space_objects, T, dt):
+    with open(output_filename, 'a') as out_file:
+        for obj in space_objects:
+            print(out_file, "%s  %d %s %f %f %f %f %f" % (
+                obj.type, obj.color, obj.m, obj.x, obj.y, obj.Vx, obj.Vy, T + dt))
+        return T + dt
+    
+def read_space_objects_stat(output_filename, m, star):
+    V = []
+    T = []
+    L = []
+    with open(output_filename, 'r') as out_file:
+        for line in output_filename:
+            if len(line.strip()) == 0 and line.split()[2] != m:
+                continue
+            V.append((line.split()[5]**2 + line.split()[6]**2)**0.5)
+            T.append(line.split()[7])
+            L.append(((line.split()[3] - star.x) **
+                     2 + (line.split()[4] - star.y)**2)**5)
+    return V, T, L
+    
 if __name__ == "__main__":
     print("This module is not for direct call!")
+
