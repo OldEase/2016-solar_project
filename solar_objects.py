@@ -1,6 +1,3 @@
-# coding: utf-8
-# license: GPLv3
-
 
 class Star:
     """Тип данных, описывающий звезду.
@@ -38,8 +35,6 @@ class Star:
     color = "red"
     """Цвет звезды"""
 
-    image = None
-    """Изображение звезды"""
 
 
 class Planet:
@@ -77,6 +72,3 @@ class Planet:
 
     color = "green"
     """Цвет планеты"""
-
-    image = None
-    """Изображение планеты"""
