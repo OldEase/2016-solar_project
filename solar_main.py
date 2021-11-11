@@ -1,11 +1,12 @@
-# coding: utf-8
-# license: GPLv3
-
-import tkinter
-from tkinter.filedialog import *
+import pygame
 from solar_vis import *
 from solar_model import *
 from solar_input import *
+
+FPS = 144
+x_screen_size = 800
+y_screen_size = 800
+screen = pygame.display.set_mode((x_screen_size, y_screen_size))
 
 perform_execution = False
 """Флаг цикличности выполнения расчёта"""
@@ -22,8 +23,16 @@ time_step = None
 """Шаг по времени при моделировании.
 Тип: float"""
 
-space_objects = []
+#space_objects = []
 """Список космических объектов."""
+
+
+def choose_max_distance(func_objects):
+    func_max_distance = 0
+    for obj in func_objects:
+        if func_max_distance ** 2 < obj.x ** 2 + obj.y ** 2:
+            func_max_distance = (obj.x ** 2 + obj.y ** 2) ** 0.5
+    return func_max_distance
 
 
 def execution():
@@ -32,40 +41,44 @@ def execution():
     Цикличность выполнения зависит от значения глобальной переменной perform_execution.
     При perform_execution == True функция запрашивает вызов самой себя по таймеру через от 1 мс до 100 мс.
     """
-    global physical_time
+    pass
+    '''global physical_time
     global displayed_time
     recalculate_space_objects_positions(space_objects, time_step.get())
     for body in space_objects:
         update_object_position(space, body)
     physical_time += time_step.get()
-    displayed_time.set("%.1f" % physical_time + " seconds gone")
+    displayed_time.set("%.1f" % physical_time + " seconds gone")'''
 
-    if perform_execution:
-        space.after(101 - int(time_speed.get()), execution)
+    '''if perform_execution:
+        space.after(101 - int(time_speed.get()), execution)'''
 
 
 def start_execution():
     """Обработчик события нажатия на кнопку Start.
     Запускает циклическое исполнение функции execution.
     """
-    global perform_execution
+    pass
+    '''global perform_execution
     perform_execution = True
     start_button['text'] = "Pause"
     start_button['command'] = stop_execution
 
     execution()
-    print('Started execution...')
+    print('Started execution...')'''
 
 
 def stop_execution():
     """Обработчик события нажатия на кнопку Start.
     Останавливает циклическое исполнение функции execution.
     """
+    pass
+    '''
     global perform_execution
     perform_execution = False
     start_button['text'] = "Start"
     start_button['command'] = start_execution
-    print('Paused execution.')
+    print('Paused execution.')'''
 
 
 def open_file_dialog():
@@ -73,7 +86,8 @@ def open_file_dialog():
     функцию считывания параметров системы небесных тел из данного файла.
     Считанные объекты сохраняются в глобальный список space_objects
     """
-    global space_objects
+    pass
+    '''global space_objects
     global perform_execution
     perform_execution = False
     for obj in space_objects:
@@ -89,7 +103,7 @@ def open_file_dialog():
         elif obj.type == 'planet':
             create_planet_image(space, obj)
         else:
-            raise AssertionError()
+            raise AssertionError()'''
 
 
 def save_file_dialog():
@@ -97,14 +111,16 @@ def save_file_dialog():
     функцию считывания параметров системы небесных тел из данного файла.
     Считанные объекты сохраняются в глобальный список space_objects
     """
-    out_filename = asksaveasfilename(filetypes=(("Text file", ".txt"),))
-    write_space_objects_data_to_file(out_filename, space_objects)
+    pass
+    '''out_filename = asksaveasfilename(filetypes=(("Text file", ".txt"),))
+    write_space_objects_data_to_file(out_filename, space_objects)'''
 
 
 def main():
     """Главная функция главного модуля.
     Создаёт объекты графического дизайна библиотеки tkinter: окно, холст, фрейм с кнопками, кнопки.
     """
+    '''
     global physical_time
     global displayed_time
     global time_step
@@ -149,4 +165,30 @@ def main():
     print('Modelling finished!')
 
 if __name__ == "__main__":
-    main()
+    main()'''
+
+
+space_objects = read_space_objects_data_from_file('double_star.txt')
+
+
+max_distance = choose_max_distance(space_objects)
+
+scale_factor = calculate_scale_factor(max_distance, y_screen_size, x_screen_size)
+
+
+pygame.display.update()
+clock = pygame.time.Clock()
+finished = False
+dt = 1000
+while not finished:
+    clock.tick(FPS)
+    fps = clock.get_fps()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            finished = True
+    screen.fill((0, 0, 0))
+    recalculate_space_objects_positions(space_objects, dt)
+    for obj in space_objects:
+        create_planet_image(screen, obj, scale_factor, y_screen_size, x_screen_size)
+    pygame.display.update()
+

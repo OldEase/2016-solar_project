@@ -20,6 +20,7 @@ scale_factor = None
 Мера: количество пикселей на один метр."""
 
 
+
 def calculate_scale_factor(func_max_distance, func_window_height, func_window_width):
     """Вычисляет значение глобальной переменной **scale_factor** по данной характерной длине"""
     func_scale_factor = 0.4*min(func_window_height, func_window_width)/func_max_distance
@@ -94,6 +95,7 @@ def update_system_name(space, system_name):
     **space** — холст для рисования.
     **system_name** — название системы тел.
     """
+    pass
     '''space.create_text(30, 80, tag="header", text=system_name, font=header_font)'''
 
 
