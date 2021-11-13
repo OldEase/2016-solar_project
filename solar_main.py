@@ -3,6 +3,8 @@ from solar_vis import *
 from solar_model import *
 from solar_input import *
 
+pygame.init()
+
 FPS = 144
 x_screen_size = 800
 y_screen_size = 800
@@ -19,12 +21,35 @@ displayed_time = None
 """Отображаемое на экране время.
 Тип: переменная tkinter"""
 
-time_step = None
+input_text = ''
+
+time_step = 1000
 """Шаг по времени при моделировании.
 Тип: float"""
 
-#space_objects = []
+space_objects = []
 """Список космических объектов."""
+
+
+def text(
+        screen,
+        font_coord,
+        font_size,
+        font_color,
+        text
+):
+    '''
+    function to draw text
+    :param screen: screen to draw on
+    :param font_coord: (x, y) - position of text
+    :param font_size: size of text
+    :param font_color: color of text
+    :param text: text to render
+    :return: None
+    '''
+    score_font = pygame.font.Font(None, font_size)
+    score_result = score_font.render(str(text), True, font_color)
+    screen.blit(score_result, font_coord)
 
 
 def choose_max_distance(func_objects):
@@ -35,13 +60,18 @@ def choose_max_distance(func_objects):
     return func_max_distance
 
 
-def execution():
+def execution(perform_execution):
     """Функция исполнения -- выполняется циклически, вызывая обработку всех небесных тел,
     а также обновляя их положение на экране.
     Цикличность выполнения зависит от значения глобальной переменной perform_execution.
     При perform_execution == True функция запрашивает вызов самой себя по таймеру через от 1 мс до 100 мс.
     """
-    pass
+    screen.fill((0, 0, 0))
+    if perform_execution:
+        recalculate_space_objects_positions(space_objects, time_step)
+    for obj in space_objects:
+        create_planet_image(screen, obj, scale_factor, y_screen_size, x_screen_size)
+    pygame.display.update()
     '''global physical_time
     global displayed_time
     recalculate_space_objects_positions(space_objects, time_step.get())
@@ -86,7 +116,13 @@ def open_file_dialog():
     функцию считывания параметров системы небесных тел из данного файла.
     Считанные объекты сохраняются в глобальный список space_objects
     """
-    pass
+    screen.fill((0, 0, 0))
+    pygame.draw.rect(screen, (255, 255, 255), (150, 400, 500, 50), 0)
+    text(screen, (160, 410), 50, (0, 0, 0), input_text)
+    text(screen, (50, 350), 50, (255, 255, 255), 'Введите название файла для считывания')
+
+
+
     '''global space_objects
     global perform_execution
     perform_execution = False
@@ -168,27 +204,39 @@ if __name__ == "__main__":
     main()'''
 
 
-space_objects = read_space_objects_data_from_file('double_star.txt')
-
-
-max_distance = choose_max_distance(space_objects)
-
-scale_factor = calculate_scale_factor(max_distance, y_screen_size, x_screen_size)
-
 
 pygame.display.update()
 clock = pygame.time.Clock()
 finished = False
-dt = 1000
 while not finished:
     clock.tick(FPS)
     fps = clock.get_fps()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             finished = True
-    screen.fill((0, 0, 0))
-    recalculate_space_objects_positions(space_objects, dt)
-    for obj in space_objects:
-        create_planet_image(screen, obj, scale_factor, y_screen_size, x_screen_size)
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_RETURN:
+                finished = True
+            elif event.key == pygame.K_BACKSPACE:
+                input_text = input_text[:-1]
+            else:
+                input_text += event.unicode
+    open_file_dialog()
     pygame.display.update()
+finished = False
+
+space_objects = read_space_objects_data_from_file(input_text)
+
+max_distance = choose_max_distance(space_objects)
+
+scale_factor = calculate_scale_factor(max_distance, y_screen_size, x_screen_size)
+
+while not finished:
+    clock.tick(FPS)
+    fps = clock.get_fps()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            finished = True
+    perform_execution = True
+    execution(perform_execution)
 
