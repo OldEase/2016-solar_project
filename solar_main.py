@@ -71,6 +71,8 @@ def execution(perform_execution):
         recalculate_space_objects_positions(space_objects, time_step)
     for obj in space_objects:
         create_planet_image(screen, obj, scale_factor, y_screen_size, x_screen_size)
+    pygame.draw.rect(screen, (0, 155, 155), (10, 10, 150, 50), 0)
+    text(screen, (40, 20), 40, (255, 255, 255), 'Pause')
     pygame.display.update()
     '''global physical_time
     global displayed_time
@@ -230,13 +232,15 @@ space_objects = read_space_objects_data_from_file(input_text)
 max_distance = choose_max_distance(space_objects)
 
 scale_factor = calculate_scale_factor(max_distance, y_screen_size, x_screen_size)
-
+perform_execution = True
 while not finished:
     clock.tick(FPS)
     fps = clock.get_fps()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             finished = True
-    perform_execution = True
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if 10 < event.pos[0] < 160 and 10 < event.pos[1] < 60:
+                perform_execution = not perform_execution
     execution(perform_execution)
 
