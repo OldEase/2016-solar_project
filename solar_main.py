@@ -2,6 +2,7 @@ import pygame
 from solar_vis import *
 from solar_model import *
 from solar_input import *
+import matplotlib.pyplot as plt
 
 pygame.init()
 
@@ -23,7 +24,12 @@ displayed_time = None
 
 input_text = ''
 
-time_step = 1000
+output_text = ''
+
+time = 0
+
+
+time_step = 10000
 """Шаг по времени при моделировании.
 Тип: float"""
 
@@ -60,7 +66,7 @@ def choose_max_distance(func_objects):
     return func_max_distance
 
 
-def execution(perform_execution):
+def execution(perform_execution, time):
     """Функция исполнения -- выполняется циклически, вызывая обработку всех небесных тел,
     а также обновляя их положение на экране.
     Цикличность выполнения зависит от значения глобальной переменной perform_execution.
@@ -69,11 +75,10 @@ def execution(perform_execution):
     screen.fill((0, 0, 0))
     if perform_execution:
         recalculate_space_objects_positions(space_objects, time_step)
+        time = write_space_objects_stat('stats.txt', space_objects, time, time_step)
     for obj in space_objects:
         create_planet_image(screen, obj, scale_factor, y_screen_size, x_screen_size)
-    pygame.draw.rect(screen, (0, 155, 155), (10, 10, 150, 50), 0)
-    text(screen, (40, 20), 40, (255, 255, 255), 'Pause')
-    pygame.display.update()
+    return time
     '''global physical_time
     global displayed_time
     recalculate_space_objects_positions(space_objects, time_step.get())
@@ -90,7 +95,9 @@ def start_execution():
     """Обработчик события нажатия на кнопку Start.
     Запускает циклическое исполнение функции execution.
     """
-    pass
+    pygame.draw.rect(screen, (0, 155, 155), (10, 10, 150, 50), 0)
+    text(screen, (40, 20), 40, (255, 255, 255), 'Pause')
+    pygame.display.update()
     '''global perform_execution
     perform_execution = True
     start_button['text'] = "Pause"
@@ -149,7 +156,10 @@ def save_file_dialog():
     функцию считывания параметров системы небесных тел из данного файла.
     Считанные объекты сохраняются в глобальный список space_objects
     """
-    pass
+    screen.fill((0, 0, 0))
+    pygame.draw.rect(screen, (255, 255, 255), (150, 400, 500, 50), 0)
+    text(screen, (160, 410), 50, (0, 0, 0), output_text)
+    text(screen, (50, 350), 50, (255, 255, 255), 'Введите название файла для сохранения')
     '''out_filename = asksaveasfilename(filetypes=(("Text file", ".txt"),))
     write_space_objects_data_to_file(out_filename, space_objects)'''
 
@@ -242,5 +252,30 @@ while not finished:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if 10 < event.pos[0] < 160 and 10 < event.pos[1] < 60:
                 perform_execution = not perform_execution
-    execution(perform_execution)
+    time = execution(perform_execution, time)
+    start_execution()
 
+finished = False
+while not finished:
+    clock.tick(FPS)
+    fps = clock.get_fps()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            finished = True
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_RETURN:
+                finished = True
+            elif event.key == pygame.K_BACKSPACE:
+                output_text = output_text[:-1]
+            else:
+                output_text += event.unicode
+    save_file_dialog()
+    pygame.display.update()
+write_space_objects_data_to_file(output_text, space_objects)
+V, T, L = read_space_objects_stat('stats.txt',)
+plt.plot(T, V, '.')
+plt.show()
+plt.plot(T, L)
+plt.show()
+plt.plot(L, V)
+plt.show()
