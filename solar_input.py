@@ -102,7 +102,7 @@ def write_space_objects_stat(output_filename, space_objects, T, dt):
         erase.close()
     with open(output_filename, 'a') as out_file:
         for obj in space_objects:
-            out_file.write( "%s %s %E %E %E %E %E %d \n" % (
+            out_file.write("%s %s %E %E %E %E %E %d \n" % (
                 obj.type, obj.color, obj.m, obj.x, obj.y, obj.Vx, obj.Vy, T + dt))
         return T + dt
     
@@ -111,7 +111,7 @@ def read_space_objects_stat(output_filename):
     T = []
     L = []
     with open(output_filename, 'r') as out_file:
-        for line in output_filename:
+        for line in out_file:
             if len(line.strip()) != 0 and line.split()[0] == 'planet':
                 V.append((float(line.split()[5])**2 + float(line.split()[6])**2)**0.5)
                 T.append(int(line.split()[7]))
