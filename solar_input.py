@@ -92,28 +92,31 @@ def write_space_objects_data_to_file(output_filename, space_objects):
     """
     with open(output_filename, 'w') as out_file:
         for obj in space_objects:
-            print(out_file, "%s %d %s %f %f %f %f %f %f" % (
+            out_file.write("%s %d %s %E %E %E %E %E \n" % (
                 obj.type, obj.R, obj.color, obj.m, obj.x, obj.y, obj.Vx, obj.Vy))
 
 def write_space_objects_stat(output_filename, space_objects, T, dt):
+    if T == 0:
+        erase = open(output_filename, 'w')
+        erase.write('')
+        erase.close()
     with open(output_filename, 'a') as out_file:
         for obj in space_objects:
-            print(out_file, "%s  %d %s %f %f %f %f %f" % (
+            print(out_file, "%s %s %E %E %E %E %E %d \n" % (
                 obj.type, obj.color, obj.m, obj.x, obj.y, obj.Vx, obj.Vy, T + dt))
         return T + dt
     
-def read_space_objects_stat(output_filename, m, star):
+def read_space_objects_stat(output_filename):
     V = []
     T = []
     L = []
     with open(output_filename, 'r') as out_file:
         for line in output_filename:
-            if len(line.strip()) == 0 and line.split()[2] != m:
-                continue
-            V.append((line.split()[5]**2 + line.split()[6]**2)**0.5)
-            T.append(line.split()[7])
-            L.append(((line.split()[3] - star.x) **
-                     2 + (line.split()[4] - star.y)**2)**5)
+            if len(line.strip()) != 0 and line.split()[0] == 'planet':
+                V.append((float(line.split()[5])**2 + float(line.split()[6])**2)**0.5)
+                T.append(int(line.split()[7]))
+                L.append(
+                    ((float(line.split()[3])) ** 2 + (float(line.split()[4]))**2)**5)
     return V, T, L
     
 if __name__ == "__main__":
