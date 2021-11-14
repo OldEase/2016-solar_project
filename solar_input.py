@@ -102,7 +102,7 @@ def write_space_objects_stat(output_filename, space_objects, T, dt):
         erase.close()
     with open(output_filename, 'a') as out_file:
         for obj in space_objects:
-            print(out_file, "%s %s %E %E %E %E %E %d \n" % (
+            out_file.write( "%s %s %E %E %E %E %E %d \n" % (
                 obj.type, obj.color, obj.m, obj.x, obj.y, obj.Vx, obj.Vy, T + dt))
         return T + dt
     
